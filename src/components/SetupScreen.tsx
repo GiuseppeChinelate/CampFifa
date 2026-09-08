@@ -4,6 +4,7 @@ import { parsePlayersBulkText, parsePlayersJsonText, type ParsedPlayerLine } fro
 import { getDefaultPlayers } from '../lib/defaultPlayers'
 import { formatPts } from '../lib/format'
 import { priceForOverall } from '../lib/pricing'
+import type { BracketType } from '../lib/bracket'
 import type { DraftMode } from '../lib/modes'
 import { ModeBar } from './ModeBar'
 
@@ -14,6 +15,7 @@ type SetupScreenProps = {
   addParticipant: (name: string) => void
   removeParticipant: (id: string) => void
   setBudget: (budget: number) => void
+  setBracketType: (bracketType: BracketType) => void
   setPlayers: (players: SetupConfig['players']) => void
   removePlayer: (id: string) => void
   startDraft: () => void
@@ -26,6 +28,7 @@ export function SetupScreen({
   addParticipant,
   removeParticipant,
   setBudget,
+  setBracketType,
   setPlayers,
   removePlayer,
   startDraft,
@@ -183,6 +186,44 @@ export function SetupScreen({
               )
             })}
           </ul>
+        </section>
+
+        {/* Chaveamento */}
+        <section className="rounded-2xl border border-slate-800 bg-slate-900/60 p-5 sm:col-span-2">
+          <h2 className="text-sm font-semibold uppercase tracking-wide text-slate-400">Chaveamento</h2>
+          <p className="mt-1 text-xs text-slate-500">Como o mata-mata depois do draft vai funcionar.</p>
+          <div className="mt-3 grid gap-3 sm:grid-cols-2">
+            <button
+              onClick={() => setBracketType('single')}
+              className={`rounded-xl border p-4 text-left transition ${
+                config.bracketType === 'single'
+                  ? 'border-emerald-500 bg-emerald-500/10'
+                  : 'border-slate-700 bg-slate-950/40 hover:border-slate-600'
+              }`}
+            >
+              <span className={`text-sm font-bold ${config.bracketType === 'single' ? 'text-emerald-400' : 'text-slate-100'}`}>
+                Tradicional
+              </span>
+              <p className="mt-1 text-xs text-slate-500">
+                Eliminação simples — perdeu, tá fora. Quem sobrar ímpar numa rodada folga e avança direto.
+              </p>
+            </button>
+            <button
+              onClick={() => setBracketType('double')}
+              className={`rounded-xl border p-4 text-left transition ${
+                config.bracketType === 'double'
+                  ? 'border-emerald-500 bg-emerald-500/10'
+                  : 'border-slate-700 bg-slate-950/40 hover:border-slate-600'
+              }`}
+            >
+              <span className={`text-sm font-bold ${config.bracketType === 'double' ? 'text-emerald-400' : 'text-slate-100'}`}>
+                Duplo (chave superior/inferior)
+              </span>
+              <p className="mt-1 text-xs text-slate-500">
+                Só sai depois de perder duas vezes. Quem perde na chave superior cai pra chave inferior e continua vivo.
+              </p>
+            </button>
+          </div>
         </section>
       </div>
 

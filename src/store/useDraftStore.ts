@@ -2,13 +2,14 @@ import { useCallback, useEffect, useReducer } from 'react'
 import type { DraftState, FormationId, Participant, Player } from '../types'
 import { chooseFormation, createInitialDraftState, endDraftManually, pickPlayer } from '../lib/draftEngine'
 import { getDefaultPlayers } from '../lib/defaultPlayers'
-import { generateBracket, setMatchWinner, type Bracket } from '../lib/bracket'
+import { generateBracket, setMatchWinner, type Bracket, type BracketType } from '../lib/bracket'
 import type { DraftMode } from '../lib/modes'
 
 export type SetupConfig = {
   participants: Participant[]
   budget: number
   players: Player[]
+  bracketType: BracketType
 }
 
 export type ResultsView = 'results' | 'bracket'
@@ -32,6 +33,7 @@ function createDefaultConfig(): SetupConfig {
     participants: [],
     budget: 1000,
     players: getDefaultPlayers(),
+    bracketType: 'single',
   }
 }
 
@@ -40,14 +42,28 @@ function loadInitialState(mode: DraftMode): AppState {
     const raw = localStorage.getItem(storageKeyFor(mode))
     if (raw) {
       const parsed = JSON.parse(raw) as AppState
-      if (parsed.config) return { ...parsed, bracket: parsed.bracket ?? null, view: parsed.view ?? 'results' }
+      if (parsed.config) {
+        return {
+          ...parsed,
+          config: { ...parsed.config, bracketType: parsed.config.bracketType ?? 'single' },
+          bracket: parsed.bracket ?? null,
+          view: parsed.view ?? 'results',
+        }
+      }
     }
     // Compatibilidade com o estado salvo antes de existirem modos: adota como "normal".
     if (mode === 'normal') {
       const legacy = localStorage.getItem(LEGACY_STORAGE_KEY)
       if (legacy) {
         const parsed = JSON.parse(legacy) as AppState
-        if (parsed.config) return { ...parsed, bracket: parsed.bracket ?? null, view: parsed.view ?? 'results' }
+        if (parsed.config) {
+          return {
+            ...parsed,
+            config: { ...parsed.config, bracketType: parsed.config.bracketType ?? 'single' },
+            bracket: parsed.bracket ?? null,
+            view: parsed.view ?? 'results',
+          }
+        }
       }
     }
     return { config: createDefaultConfig(), draft: null, bracket: null, view: 'results' }
@@ -69,6 +85,7 @@ export function peekModeSummary(mode: DraftMode): AppState | null {
 
 type Action =
   | { type: 'SET_BUDGET'; budget: number }
+  | { type: 'SET_BRACKET_TYPE'; bracketType: BracketType }
   | { type: 'ADD_PARTICIPANT'; name: string }
   | { type: 'REMOVE_PARTICIPANT'; id: string }
   | { type: 'SET_PLAYERS'; players: Player[] }
@@ -89,6 +106,9 @@ function reducer(state: AppState, action: Action): AppState {
   switch (action.type) {
     case 'SET_BUDGET':
       return { ...state, config: { ...state.config, budget: Math.max(0, action.budget) } }
+
+    case 'SET_BRACKET_TYPE':
+      return { ...state, config: { ...state.config, bracketType: action.bracketType } }
 
     case 'ADD_PARTICIPANT': {
       const name = action.name.trim()
@@ -143,7 +163,7 @@ function reducer(state: AppState, action: Action): AppState {
 
     case 'GENERATE_BRACKET': {
       if (!state.draft || state.draft.phase !== 'finished') return state
-      const bracket = generateBracket(state.draft.order)
+      const bracket = generateBracket(state.draft.order, state.config.bracketType)
       return { ...state, bracket }
     }
 
@@ -176,6 +196,7 @@ export function useDraftStore(mode: DraftMode) {
   }, [mode, state])
 
   const setBudget = useCallback((budget: number) => dispatch({ type: 'SET_BUDGET', budget }), [])
+  const setBracketType = useCallback((bracketType: BracketType) => dispatch({ type: 'SET_BRACKET_TYPE', bracketType }), [])
   const addParticipant = useCallback((name: string) => dispatch({ type: 'ADD_PARTICIPANT', name }), [])
   const removeParticipant = useCallback((id: string) => dispatch({ type: 'REMOVE_PARTICIPANT', id }), [])
   const setPlayers = useCallback((players: Player[]) => dispatch({ type: 'SET_PLAYERS', players }), [])
@@ -201,6 +222,7 @@ export function useDraftStore(mode: DraftMode) {
   return {
     state,
     setBudget,
+    setBracketType,
     addParticipant,
     removeParticipant,
     setPlayers,

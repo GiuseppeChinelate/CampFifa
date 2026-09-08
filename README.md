@@ -9,7 +9,11 @@ Web app de draft de elenco para campeonatos de FIFA entre amigos. Cada participa
 - Participante sem saldo para o jogador comprável (dentro das posições que ainda precisa) mais barato é pulado automaticamente
 - **Formação por participante**: no início do primeiro turno de cada um, escolhe a formação (4-4-2, 4-3-3, 4-2-3-1, 3-5-2, 3-4-3 ou 5-3-2 — ver [src/lib/formations.ts](src/lib/formations.ts)). Enquanto o time titular não está completo, só dá pra comprar jogadores das posições em aberto; depois de completo, dá pra reforçar o banco livremente, sem restrição de posição — até **5 reservas** (`MAX_BENCH` em [src/lib/draftEngine.ts](src/lib/draftEngine.ts)), mesmo que sobre saldo
 - Draft termina quando ninguém mais pode comprar, ou manualmente
-- **Chaveamento**: tela própria, aberta pelo botão "Ir para o chaveamento" na tela de resultado. Sorteia um mata-mata com os nomes dos participantes ([src/lib/bracket.ts](src/lib/bracket.ts)) — ajusta sozinho pra qualquer quantidade, só a 1ª rodada pode ficar ímpar (quem sobra folga e avança direto sem jogar), as rodadas seguintes sempre fecham em pares. Clicar no vencedor de cada confronto avança ele pro próximo, em cascata até sair um campeão
+- **Chaveamento**: tela própria, aberta pelo botão "Ir para o chaveamento" na tela de resultado. Escolhido na configuração, antes do draft ([src/lib/bracket.ts](src/lib/bracket.ts)):
+  - **Tradicional** — eliminação simples: perdeu, tá fora. Sorteia os participantes, ajusta sozinho pra qualquer quantidade (só a 1ª rodada pode ficar ímpar, quem sobra folga e avança direto).
+  - **Duplo** — chave superior (eliminação simples normal) + chave inferior (quem perde na chave superior cai lá e segue vivo até perder de novo) + grande final, com decisão (reset) se quem vier da chave inferior vencer a 1ª grande final, já que só tem uma derrota. Byes acontecem nas duas chaves quando falta par, sem travar o chaveamento.
+  
+  Nos dois formatos, clicar no vencedor de cada confronto avança ele pro próximo — em cascata, incluindo entre as duas chaves no formato duplo — até sair um campeão.
 
 ## Rodando localmente
 

@@ -22,6 +22,7 @@ function DraftApp({ mode, onHome }: { mode: DraftMode; onHome: () => void }) {
   const {
     state,
     setBudget,
+    setBracketType,
     addParticipant,
     removeParticipant,
     setPlayers,
@@ -48,6 +49,7 @@ function DraftApp({ mode, onHome }: { mode: DraftMode; onHome: () => void }) {
         addParticipant={addParticipant}
         removeParticipant={removeParticipant}
         setBudget={setBudget}
+        setBracketType={setBracketType}
         setPlayers={setPlayers}
         removePlayer={removePlayer}
         startDraft={startDraft}
