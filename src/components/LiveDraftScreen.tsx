@@ -1,50 +1,52 @@
 import { useMemo, useState } from 'react'
-import type { DraftState, Player } from '../types'
-import { getCurrentParticipantId, getRemainingBudget, getSpent } from '../lib/draftEngine'
+import type { DraftState, Player, Position } from '../types'
+import {
+  getBenchCount,
+  getBuyablePool,
+  getCurrentParticipantId,
+  getRemainingBudget,
+  getSpent,
+  isFormationComplete,
+  isSquadFull,
+  MAX_BENCH,
+} from '../lib/draftEngine'
+import { FORMATIONS } from '../lib/formations'
+import { sortPlayers, SORT_OPTIONS, type SortKey } from '../lib/sortPlayers'
 import { formatPts } from '../lib/format'
 import { ConfirmModal } from './ConfirmModal'
+import { FormationPicker } from './FormationPicker'
+import { PositionGrid } from './PositionGrid'
+import { PositionPlayerPicker } from './PositionPlayerPicker'
+import type { DraftMode } from '../lib/modes'
+import type { FormationId } from '../types'
+import { ModeBar } from './ModeBar'
 
 type LiveDraftScreenProps = {
+  mode: DraftMode
+  onHome: () => void
   draft: DraftState
   pick: (participantId: string, playerId: string) => void
+  chooseFormation: (participantId: string, formation: FormationId) => void
   endDraft: () => void
 }
 
-type SortKey = 'price-desc' | 'price-asc' | 'overall-desc' | 'overall-asc' | 'name-asc'
-
-const SORT_OPTIONS: { value: SortKey; label: string }[] = [
-  { value: 'price-desc', label: 'Preço (maior → menor)' },
-  { value: 'price-asc', label: 'Preço (menor → maior)' },
-  { value: 'overall-desc', label: 'Overall (maior → menor)' },
-  { value: 'overall-asc', label: 'Overall (menor → maior)' },
-  { value: 'name-asc', label: 'Nome (A → Z)' },
-]
-
-function sortPlayers(players: Player[], sort: SortKey): Player[] {
-  const list = [...players]
-  switch (sort) {
-    case 'price-desc':
-      return list.sort((a, b) => b.price - a.price)
-    case 'price-asc':
-      return list.sort((a, b) => a.price - b.price)
-    case 'overall-desc':
-      return list.sort((a, b) => b.overall - a.overall)
-    case 'overall-asc':
-      return list.sort((a, b) => a.overall - b.overall)
-    case 'name-asc':
-      return list.sort((a, b) => a.name.localeCompare(b.name))
-  }
-}
-
-export function LiveDraftScreen({ draft, pick, endDraft }: LiveDraftScreenProps) {
+export function LiveDraftScreen({ mode, onHome, draft, pick, chooseFormation, endDraft }: LiveDraftScreenProps) {
   const [search, setSearch] = useState('')
   const [sort, setSort] = useState<SortKey>('price-desc')
   const [pendingPlayer, setPendingPlayer] = useState<Player | null>(null)
   const [confirmEnd, setConfirmEnd] = useState(false)
+  const [openSlot, setOpenSlot] = useState<Position | null>(null)
 
   const currentId = getCurrentParticipantId(draft)
   const currentParticipant = draft.participants.find((p) => p.id === currentId) ?? null
   const currentBudget = currentId ? getRemainingBudget(draft, currentId) : 0
+  const currentFormationId = currentId ? draft.formations[currentId] : undefined
+  const currentFormation = currentFormationId ? FORMATIONS[currentFormationId] : null
+  const currentRoster = currentId ? (draft.rosters[currentId] ?? []) : []
+  const formationComplete = currentId ? isFormationComplete(draft, currentId) : false
+  const benchCount = currentId ? getBenchCount(draft, currentId) : 0
+  const squadFull = currentId ? isSquadFull(draft, currentId) : false
+  const buyablePool = currentId ? getBuyablePool(draft, currentId) : []
 
   const filtered = useMemo(() => {
     const q = search.trim().toLowerCase()
@@ -62,6 +64,7 @@ export function LiveDraftScreen({ draft, pick, endDraft }: LiveDraftScreenProps)
 
   return (
     <div className="mx-auto w-full max-w-5xl px-4 py-6 sm:py-8">
+      <ModeBar mode={mode} onHome={onHome} />
       {/* Banner da vez atual */}
       <div className="sticky top-0 z-20 -mx-4 mb-6 border-b border-emerald-500/30 bg-slate-950/95 px-4 py-4 backdrop-blur sm:static sm:mx-0 sm:rounded-2xl sm:border sm:border-emerald-500/40 sm:bg-emerald-500/10 sm:px-6">
         <div className="flex flex-col items-center gap-1 text-center sm:flex-row sm:justify-between sm:text-left">
@@ -70,6 +73,11 @@ export function LiveDraftScreen({ draft, pick, endDraft }: LiveDraftScreenProps)
             <p className="text-2xl font-bold text-slate-50 sm:text-3xl">
               {currentParticipant?.name ?? '—'}
             </p>
+            {currentFormationId && (
+              <p className="text-xs text-slate-400">
+                {currentFormation!.label} {formationComplete ? `· reservas ${benchCount}/${MAX_BENCH}` : ''}
+              </p>
+            )}
           </div>
           <div>
             <p className="text-xs font-semibold uppercase tracking-wide text-emerald-400 sm:text-right">
@@ -101,70 +109,105 @@ export function LiveDraftScreen({ draft, pick, endDraft }: LiveDraftScreenProps)
                 </p>
               )
             }
+            if (e.type === 'formation') {
+              return (
+                <p key={i} className="text-xs text-slate-500">
+                  <span className="text-slate-300 font-medium">{participantName}</span> escolheu a formação{' '}
+                  <span className="text-slate-300 font-medium">{e.formation}</span>
+                </p>
+              )
+            }
             return null
           })}
         </div>
       )}
 
       <div className="grid gap-6 lg:grid-cols-[1fr_320px]">
-        {/* Lista de jogadores */}
-        <section>
-          <div className="mb-3 flex flex-col gap-2 sm:flex-row">
-            <input
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              placeholder="Buscar jogador..."
-              className="flex-1 rounded-lg border border-slate-700 bg-slate-900 px-3 py-2 text-sm text-slate-100 placeholder:text-slate-500 focus:border-emerald-500 focus:outline-none"
+        {/* Área principal: formação / campo / lista livre */}
+        <section className="space-y-4">
+          {!currentFormationId && currentParticipant && (
+            <FormationPicker
+              participantName={currentParticipant.name}
+              onChoose={(formation) => chooseFormation(currentParticipant.id, formation)}
             />
-            <select
-              value={sort}
-              onChange={(e) => setSort(e.target.value as SortKey)}
-              className="rounded-lg border border-slate-700 bg-slate-900 px-3 py-2 text-sm text-slate-100 focus:border-emerald-500 focus:outline-none"
-            >
-              {SORT_OPTIONS.map((o) => (
-                <option key={o.value} value={o.value}>
-                  {o.label}
-                </option>
-              ))}
-            </select>
-          </div>
+          )}
 
-          <div className="rounded-2xl border border-slate-800 bg-slate-900/60">
-            {filtered.length === 0 ? (
-              <p className="px-4 py-6 text-center text-sm text-slate-500">Nenhum jogador encontrado.</p>
-            ) : (
-              <ul className="divide-y divide-slate-800/80 max-h-[60vh] overflow-y-auto">
-                {filtered.map((p) => {
-                  const affordable = p.price <= currentBudget
-                  return (
-                    <li
-                      key={p.id}
-                      className={`flex items-center justify-between gap-3 px-4 py-3 ${
-                        affordable ? '' : 'opacity-40'
-                      }`}
-                    >
-                      <div className="min-w-0">
-                        <p className="truncate text-sm font-medium text-slate-100">{p.name}</p>
-                        <p className="text-xs text-slate-500">Overall {p.overall}</p>
-                      </div>
-                      <div className="flex items-center gap-3 shrink-0">
-                        <span className={`text-sm font-semibold ${affordable ? 'text-emerald-400' : 'text-slate-500'}`}>
-                          {formatPts(p.price)}
-                        </span>
-                        <button
-                          disabled={!affordable || !currentId}
-                          onClick={() => setPendingPlayer(p)}
-                          className="rounded-lg bg-emerald-500 px-3 py-1.5 text-xs font-semibold text-emerald-950 hover:bg-emerald-400 active:scale-[0.98] transition disabled:cursor-not-allowed disabled:bg-slate-700 disabled:text-slate-500"
+          {currentFormation && (
+            <PositionGrid formation={currentFormation} roster={currentRoster} onSlotClick={(position) => setOpenSlot(position)} />
+          )}
+
+          {currentFormationId && formationComplete && squadFull && (
+            <div className="rounded-lg border border-slate-700 bg-slate-900/60 px-4 py-2 text-sm text-slate-300">
+              Elenco fechado — {MAX_BENCH} reservas já contratados, mesmo com saldo sobrando. Aguardando os outros participantes.
+            </div>
+          )}
+
+          {currentFormationId && formationComplete && !squadFull && (
+            <>
+              <div className="rounded-lg border border-emerald-800/60 bg-emerald-950/30 px-4 py-2 text-sm text-emerald-300">
+                Time titular completo — reforce o banco com qualquer jogador disponível (limite de {MAX_BENCH} reservas, faltam {MAX_BENCH - benchCount}).
+              </div>
+
+              <div className="flex flex-col gap-2 sm:flex-row">
+                <input
+                  value={search}
+                  onChange={(e) => setSearch(e.target.value)}
+                  placeholder="Buscar jogador..."
+                  className="flex-1 rounded-lg border border-slate-700 bg-slate-900 px-3 py-2 text-sm text-slate-100 placeholder:text-slate-500 focus:border-emerald-500 focus:outline-none"
+                />
+                <select
+                  value={sort}
+                  onChange={(e) => setSort(e.target.value as SortKey)}
+                  className="rounded-lg border border-slate-700 bg-slate-900 px-3 py-2 text-sm text-slate-100 focus:border-emerald-500 focus:outline-none"
+                >
+                  {SORT_OPTIONS.map((o) => (
+                    <option key={o.value} value={o.value}>
+                      {o.label}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div className="rounded-2xl border border-slate-800 bg-slate-900/60">
+                {filtered.length === 0 ? (
+                  <p className="px-4 py-6 text-center text-sm text-slate-500">Nenhum jogador encontrado.</p>
+                ) : (
+                  <ul className="divide-y divide-slate-800/80 max-h-[60vh] overflow-y-auto">
+                    {filtered.map((p) => {
+                      const affordable = p.price <= currentBudget
+                      return (
+                        <li
+                          key={p.id}
+                          className={`flex items-center justify-between gap-3 px-4 py-3 ${
+                            affordable ? '' : 'opacity-40'
+                          }`}
                         >
-                          Comprar
-                        </button>
-                      </div>
-                    </li>
-                  )
-                })}
-              </ul>
-            )}
-          </div>
+                          <div className="min-w-0">
+                            <p className="truncate text-sm font-medium text-slate-100">{p.name}</p>
+                            <p className="text-xs text-slate-500">
+                              {p.position} · Overall {p.overall}
+                            </p>
+                          </div>
+                          <div className="flex items-center gap-3 shrink-0">
+                            <span className={`text-sm font-semibold ${affordable ? 'text-emerald-400' : 'text-slate-500'}`}>
+                              {formatPts(p.price)}
+                            </span>
+                            <button
+                              disabled={!affordable || !currentId}
+                              onClick={() => setPendingPlayer(p)}
+                              className="rounded-lg bg-emerald-500 px-3 py-1.5 text-xs font-semibold text-emerald-950 hover:bg-emerald-400 active:scale-[0.98] transition disabled:cursor-not-allowed disabled:bg-slate-700 disabled:text-slate-500"
+                            >
+                              Comprar
+                            </button>
+                          </div>
+                        </li>
+                      )
+                    })}
+                  </ul>
+                )}
+              </div>
+            </>
+          )}
         </section>
 
         {/* Painel de participantes */}
@@ -179,6 +222,9 @@ export function LiveDraftScreen({ draft, pick, endDraft }: LiveDraftScreenProps)
                 const remaining = getRemainingBudget(draft, id)
                 const spent = getSpent(draft, id)
                 const count = draft.rosters[id]?.length ?? 0
+                const formationId = draft.formations[id]
+                const complete = isFormationComplete(draft, id)
+                const bench = getBenchCount(draft, id)
                 const isCurrent = id === currentId
                 return (
                   <li
@@ -193,14 +239,19 @@ export function LiveDraftScreen({ draft, pick, endDraft }: LiveDraftScreenProps)
                       <span className={`text-sm font-semibold ${isCurrent ? 'text-emerald-400' : 'text-slate-200'}`}>
                         {participant.name}
                       </span>
-                      {isCurrent && (
+                      {isCurrent ? (
                         <span className="text-[10px] font-bold uppercase tracking-wide text-emerald-400">
                           na vez
                         </span>
-                      )}
+                      ) : formationId ? (
+                        <span className="text-[10px] font-medium uppercase tracking-wide text-slate-500">{formationId}</span>
+                      ) : null}
                     </div>
                     <div className="mt-1 flex justify-between text-xs text-slate-500">
-                      <span>{count} jogador{count !== 1 ? 'es' : ''}</span>
+                      <span>
+                        {count} jogador{count !== 1 ? 'es' : ''}
+                        {complete && ` · reservas ${bench}/${MAX_BENCH}`}
+                      </span>
                       <span>gasto {formatPts(spent)}</span>
                     </div>
                     <div className="mt-1 text-sm font-medium text-slate-300">
@@ -221,10 +272,24 @@ export function LiveDraftScreen({ draft, pick, endDraft }: LiveDraftScreenProps)
         </aside>
       </div>
 
+      {openSlot && currentId && currentParticipant && (
+        <PositionPlayerPicker
+          position={openSlot}
+          pool={buyablePool}
+          budget={currentBudget}
+          participantName={currentParticipant.name}
+          onBuy={(playerId) => {
+            pick(currentId, playerId)
+            setOpenSlot(null)
+          }}
+          onClose={() => setOpenSlot(null)}
+        />
+      )}
+
       {pendingPlayer && currentParticipant && (
         <ConfirmModal
           title={`Confirmar compra`}
-          description={`${currentParticipant.name} vai comprar ${pendingPlayer.name} (overall ${pendingPlayer.overall}) por ${formatPts(pendingPlayer.price)}.`}
+          description={`${currentParticipant.name} vai comprar ${pendingPlayer.name} (${pendingPlayer.position}, overall ${pendingPlayer.overall}) por ${formatPts(pendingPlayer.price)}.`}
           confirmLabel="Comprar"
           onConfirm={handleConfirmPick}
           onCancel={() => setPendingPlayer(null)}

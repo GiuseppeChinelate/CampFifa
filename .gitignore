@@ -12,6 +12,10 @@ dist
 dist-ssr
 *.local
 
+# Saída gerada pelo scraper do Futbin (regenerável via npm run fetch:futbin).
+# Listas curadas manualmente ficam em src/data/ e são versionadas normalmente.
+/data/
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json

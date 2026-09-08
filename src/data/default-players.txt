@@ -1,0 +1,239 @@
+Kylian Mbappé, 91, ATA
+Erling Haaland, 91, ATA
+Ousmane Dembélé, 90, PD
+Rodri, 90, VOL
+Vitinha, 90, MC
+Harry Kane, 90, ATA
+Michael Olise, 90, PD
+Pedri, 90, MC
+Nuno Mendes, 86, LE
+Federico Dimarco, 85, LE
+Grimaldo, 85, LE
+Theo Hernández, 84, LE
+Alphonso Davies, 84, LE
+Joško Gvardiol, 84, LE
+Marc Cucurella, 84, LE
+Ferland Mendy, 83, LE
+Alejandro Balde, 83, LE
+Destiny Udogie, 83, LE
+Andrew Robertson, 83, LE
+David Raum, 82, LE
+Milos Kerkez, 82, LE
+Maximilian Mittelstädt, 82, LE
+Antonee Robinson, 82, LE
+Marcos Acuña, 82, LE
+Luke Shaw, 82, LE
+Carlos Augusto, 81, LE
+Miguel Gutiérrez, 81, LE
+Rayan Aït-Nouri, 81, LE
+Ferdi Kadıoğlu, 81, LE
+Pervis Estupiñán, 80, LE
+Rico Lewis, 80, LE
+Lucas Hernández, 80, LE
+Caio Henrique, 80, LE
+Achraf Hakimi, 89, LD
+Jules Koundé, 87, LD
+Trent Alexander-Arnold, 86, LD
+Dani Carvajal, 85, LD
+Marcos Llorente, 84, LD
+João Cancelo, 84, LD
+Denzel Dumfries, 84, LD
+Kyle Walker, 84, LD
+Jeremie Frimpong, 84, LD
+Giovanni Di Lorenzo, 83, LD
+Benjamin White, 83, LD
+Pedro Porro, 83, LD
+Konrad Laimer, 82, LD
+Jurriën Timber, 82, LD
+Reece James, 82, LD
+Nahuel Molina, 82, LD
+Kieran Trippier, 82, LD
+Daniel Muñoz, 81, LD
+Malo Gusto, 81, LD
+Diogo Dalot, 81, LD
+Noussair Mazraoui, 81, LD
+Danilo, 81, LD
+Timothy Castagne, 80, LD
+Tino Livramento, 80, LD
+Vanderson, 80, LD
+Virgil van Dijk, 89, ZAG
+Rúben Dias, 88, ZAG
+Antonio Rüdiger, 88, ZAG
+William Saliba, 87, ZAG
+Marquinhos, 87, ZAG
+Alessandro Bastoni, 87, ZAG
+Gabriel Magalhães, 86, ZAG
+Bremer, 86, ZAG
+Jonathan Tah, 86, ZAG
+Éder Militão, 85, ZAG
+Ronald Araújo, 85, ZAG
+Nico Schlotterbeck, 85, ZAG
+John Stones, 85, ZAG
+David Alaba, 85, ZAG
+Manuel Akanji, 84, ZAG
+Kalidou Koulibaly, 84, ZAG
+Benjamin Pavard, 84, ZAG
+Francesco Acerbi, 84, ZAG
+Pau Torres, 84, ZAG
+Matthijs de Ligt, 84, ZAG
+Cristian Romero, 84, ZAG
+Aymeric Laporte, 84, ZAG
+Andreas Christensen, 83, ZAG
+Kim Min Jae, 83, ZAG
+Ibrahima Konaté, 83, ZAG
+Fikayo Tomori, 83, ZAG
+Lisandro Martínez, 83, ZAG
+José María Giménez, 83, ZAG
+Edmond Tapsoba, 83, ZAG
+Willian Pacho, 83, ZAG
+Stefan de Vrij, 83, ZAG
+Dayot Upamecano, 82, ZAG
+Micky van de Ven, 82, ZAG
+Lucas Beraldo, 82, ZAG
+Robin Le Normand, 82, ZAG
+Piero Hincapié, 82, ZAG
+Gonçalo Inácio, 82, ZAG
+Ousmane Diomande, 82, ZAG
+Niklas Süle, 82, ZAG
+Emre Can, 82, ZAG
+Dan-Axel Zagadou, 81, ZAG
+Waldemar Anton, 81, ZAG
+Maxence Lacroix, 81, ZAG
+Jean-Clair Todibo, 81, ZAG
+Marc Guéhi, 81, ZAG
+Murillo, 81, ZAG
+Castello Lukeba, 81, ZAG
+Joe Gomez, 80, ZAG
+Pau Cubarsí, 80, ZAG
+Leny Yoro, 80, ZAG
+Declan Rice, 87, VOL
+Aurélien Tchouaméni, 86, VOL
+Joshua Kimmich, 86, VOL
+Hakan Çalhanoğlu, 86, VOL
+Casemiro, 84, VOL
+Granit Xhaka, 84, VOL
+Thomas Partey, 83, VOL
+João Palhinha, 83, VOL
+Manuel Locatelli, 83, VOL
+Sandro Tonali, 83, VOL
+Éderson, 82, VOL
+Douglas Luiz, 82, VOL
+Amadou Onana, 82, VOL
+Boubacar Kamara, 81, VOL
+Moisés Caicedo, 81, VOL
+Jude Bellingham, 90, MC
+Federico Valverde, 88, MC
+Nicolò Barella, 87, MC
+Frenkie de Jong, 87, MC
+Eduardo Camavinga, 86, MC
+Luka Modrić, 86, MC
+Alexis Mac Allister, 85, MC
+İlkay Gündoğan, 85, MC
+Gavi, 84, MC
+Warren Zaïre-Emery, 83, MC
+Rodrigo De Paul, 83, MC
+Kobbie Mainoo, 82, MC
+Dominik Szoboszlai, 82, MC
+Enzo Fernández, 82, MC
+Kevin De Bruyne, 90, MEI
+Martin Ødegaard, 89, MEI
+Jamal Musiala, 88, MEI
+Florian Wirtz, 88, MEI
+Bruno Fernandes, 87, MEI
+Cole Palmer, 86, MEI
+James Maddison, 85, MEI
+Julian Brandt, 84, MEI
+Lucas Paquetá, 84, MEI
+Dani Olmo, 84, MEI
+Brahim Díaz, 83, MEI
+Lorenzo Pellegrini, 83, MEI
+Xavi Simons, 83, MEI
+Arda Güler, 81, MEI
+Leroy Sané, 85, MD
+Moussa Diaby, 84, MD
+Serge Gnabry, 83, MD
+Takefusa Kubo, 83, MD
+Dejan Kulusevski, 83, MD
+Leon Bailey, 82, MD
+Jadon Sancho, 82, MD
+Pedro Neto, 81, MD
+Viktor Tsygankov, 81, MD
+Noni Madueke, 80, MD
+Nico Williams, 85, ME
+Kingsley Coman, 84, ME
+Gabriel Martinelli, 84, ME
+Anthony Gordon, 83, ME
+Karim Adeyemi, 82, ME
+Alejandro Garnacho, 82, ME
+Ferran Torres, 82, ME
+Harvey Barnes, 81, ME
+Samuel Lino, 81, ME
+Bradley Barcola, 81, ME
+Lautaro Martínez, 89, ATA
+Robert Lewandowski, 88, ATA
+Victor Osimhen, 87, ATA
+Karim Benzema, 86, ATA
+Alexander Isak, 85, ATA
+Viktor Gyökeres, 85, ATA
+Cristiano Ronaldo, 85, ATA
+Ollie Watkins, 85, ATA
+Loïs Openda, 85, ATA
+Dušan Vlahović, 84, ATA
+Serhou Guirassy, 84, ATA
+Marcus Thuram, 84, ATA
+Artem Dovbyk, 84, ATA
+Darwin Núñez, 82, ATA
+Rasmus Højlund, 80, ATA
+Antoine Griezmann, 88, SA
+Heung-min Son, 87, SA
+Julián Álvarez, 84, SA
+Christopher Nkunku, 84, SA
+Iago Aspas, 84, SA
+Diogo Jota, 84, SA
+Memphis Depay, 82, SA
+Paulo Dybala, 82, SA
+Gerard Moreno, 82, SA
+João Félix, 81, SA
+Vinícius Jr., 90, PE
+Rafael Leão, 86, PE
+Kvaratskhelia, 85, PE
+Jack Grealish, 84, PE
+Luis Díaz, 84, PE
+Marcus Rashford, 82, PE
+Cody Gakpo, 82, PE
+Mikel Oyarzabal, 82, PE
+Jérémy Doku, 81, PE
+Kaoru Mitoma, 81, PE
+Mattia Zaccagni, 81, PE
+Mohamed Salah, 89, PD
+Bukayo Saka, 87, PD
+Rodrygo, 86, PD
+Raphinha, 84, PD
+Lamine Yamal, 83, PD
+Federico Chiesa, 81, PD
+Jarrod Bowen, 81, PD
+Bryan Mbeumo, 80, PD
+Nico González, 80, PD
+Matheus Cunha, 80, PD
+Thibaut Courtois, 91, GOL
+Alisson Becker, 89, GOL
+Gianluigi Donnarumma, 88, GOL
+Emiliano Martínez, 87, GOL
+Marc-André ter Stegen, 87, GOL
+Jan Oblak, 87, GOL
+Ederson, 86, GOL
+Mike Maignan, 86, GOL
+Manuel Neuer, 85, GOL
+David Raya, 85, GOL
+Diogo Costa, 85, GOL
+André Onana, 83, GOL
+Yassine Bounou, 83, GOL
+Guglielmo Vicario, 83, GOL
+Nick Pope, 83, GOL
+Wojciech Szczęsny, 82, GOL
+Unai Simón, 82, GOL
+Lucas Chevalier, 82, GOL
+Kepa Arrizabalaga, 81, GOL
+Robert Sánchez, 81, GOL
+Bart Verbruggen, 80, GOL
+Marco Bizot, 80, GOL

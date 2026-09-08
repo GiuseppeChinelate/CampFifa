@@ -28,3 +28,16 @@ body {
   background: rgb(51 65 85);
   border-radius: 9999px;
 }
+
+.pitch-markings line,
+.pitch-markings path,
+.pitch-markings circle {
+  stroke: rgb(255 255 255 / 0.35);
+  stroke-width: 1.5;
+  fill: none;
+  vector-effect: non-scaling-stroke;
+}
+.pitch-markings .mk-fill {
+  fill: rgb(255 255 255 / 0.35);
+  stroke: none;
+}

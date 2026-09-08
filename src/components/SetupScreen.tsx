@@ -1,10 +1,15 @@
-import { useMemo, useState } from 'react'
+import { useMemo, useRef, useState } from 'react'
 import type { SetupConfig } from '../store/useDraftStore'
-import { parsePlayersBulkText } from '../lib/parsePlayers'
+import { parsePlayersBulkText, parsePlayersJsonText, type ParsedPlayerLine } from '../lib/parsePlayers'
+import { getDefaultPlayers } from '../lib/defaultPlayers'
 import { formatPts } from '../lib/format'
 import { priceForOverall } from '../lib/pricing'
+import type { DraftMode } from '../lib/modes'
+import { ModeBar } from './ModeBar'
 
 type SetupScreenProps = {
+  mode: DraftMode
+  onHome: () => void
   config: SetupConfig
   addParticipant: (name: string) => void
   removeParticipant: (id: string) => void
@@ -15,6 +20,8 @@ type SetupScreenProps = {
 }
 
 export function SetupScreen({
+  mode,
+  onHome,
   config,
   addParticipant,
   removeParticipant,
@@ -27,6 +34,8 @@ export function SetupScreen({
   const [bulkText, setBulkText] = useState('')
   const [parseErrors, setParseErrors] = useState<string[]>([])
   const [playerFilter, setPlayerFilter] = useState('')
+  const [importError, setImportError] = useState<string | null>(null)
+  const fileInputRef = useRef<HTMLInputElement>(null)
 
   const canStart = config.participants.length >= 2 && config.players.length >= 1
 
@@ -36,9 +45,7 @@ export function SetupScreen({
     setNameInput('')
   }
 
-  function handleParseBulk() {
-    if (!bulkText.trim()) return
-    const results = parsePlayersBulkText(bulkText)
+  function ingestResults(results: ParsedPlayerLine[]) {
     const newPlayers = results.filter((r) => r.player).map((r) => r.player!)
     const errors = results.filter((r) => r.error).map((r) => `"${r.raw}" — ${r.error}`)
 
@@ -47,7 +54,31 @@ export function SetupScreen({
 
     setPlayers([...config.players, ...deduped])
     setParseErrors(errors)
+  }
+
+  function handleParseBulk() {
+    if (!bulkText.trim()) return
+    ingestResults(parsePlayersBulkText(bulkText))
     setBulkText('')
+  }
+
+  function handleLoadDefaults() {
+    const defaults = getDefaultPlayers()
+    ingestResults(defaults.map((p) => ({ raw: `${p.name}, ${p.overall}`, player: p })))
+  }
+
+  async function handleFileImport(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0]
+    e.target.value = ''
+    if (!file) return
+    setImportError(null)
+    try {
+      const text = await file.text()
+      const isJson = file.name.toLowerCase().endsWith('.json')
+      ingestResults(isJson ? parsePlayersJsonText(text) : parsePlayersBulkText(text))
+    } catch {
+      setImportError('Não foi possível ler o arquivo.')
+    }
   }
 
   const filteredPlayers = useMemo(() => {
@@ -58,6 +89,7 @@ export function SetupScreen({
 
   return (
     <div className="mx-auto w-full max-w-4xl px-4 py-8 sm:py-12">
+      <ModeBar mode={mode} onHome={onHome} />
       <header className="mb-8">
         <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-slate-50">
           Configurar Draft ⚽
@@ -160,16 +192,19 @@ export function SetupScreen({
           Jogadores disponíveis ({config.players.length})
         </h2>
         <p className="mt-1 text-xs text-slate-500">
-          Cole uma lista no formato <code className="text-slate-400">Nome, Overall</code> — uma linha por jogador.
+          Cole uma lista no formato <code className="text-slate-400">Nome, Overall, Posição</code> — uma linha por jogador
+          (posição aceita siglas em PT ou EN, ex: ZAG/CB, LE/LB, ATA/ST), ou
+          importe um arquivo <code className="text-slate-400">.txt</code>/<code className="text-slate-400">.json</code> gerado
+          por <code className="text-slate-400">npm run fetch:futbin</code>.
         </p>
         <textarea
           value={bulkText}
           onChange={(e) => setBulkText(e.target.value)}
-          placeholder={'Lionel Messi, 90\nKylian Mbappé, 91\nEderson, 86'}
+          placeholder={'Lionel Messi, 90, ATA\nKylian Mbappé, 91, PE\nEderson, 86, GOL'}
           rows={5}
           className="mt-3 w-full resize-y rounded-lg border border-slate-700 bg-slate-950 px-3 py-2 font-mono text-sm text-slate-100 placeholder:text-slate-600 focus:border-emerald-500 focus:outline-none"
         />
-        <div className="mt-2 flex items-center justify-between">
+        <div className="mt-2 flex flex-wrap items-center gap-x-4 gap-y-2">
           <button
             onClick={handleParseBulk}
             disabled={!bulkText.trim()}
@@ -177,15 +212,30 @@ export function SetupScreen({
           >
             Adicionar jogadores
           </button>
+          <button
+            onClick={() => fileInputRef.current?.click()}
+            className="rounded-lg border border-slate-700 bg-slate-800 px-4 py-2 text-sm font-semibold text-slate-200 hover:bg-slate-750 active:scale-[0.98] transition"
+          >
+            Importar arquivo
+          </button>
+          <input ref={fileInputRef} type="file" accept=".txt,.json" onChange={handleFileImport} className="hidden" />
+          <button
+            onClick={handleLoadDefaults}
+            className="rounded-lg border border-slate-700 bg-slate-800 px-4 py-2 text-sm font-semibold text-slate-200 hover:bg-slate-750 active:scale-[0.98] transition"
+          >
+            Carregar lista padrão
+          </button>
           {config.players.length > 0 && (
             <button
               onClick={() => setPlayers([])}
-              className="text-xs font-medium text-slate-500 hover:text-red-400 transition"
+              className="ml-auto text-xs font-medium text-slate-500 hover:text-red-400 transition"
             >
               limpar lista
             </button>
           )}
         </div>
+
+        {importError && <p className="mt-2 text-xs text-red-400">{importError}</p>}
 
         {parseErrors.length > 0 && (
           <div className="mt-3 rounded-lg border border-amber-800/60 bg-amber-950/40 px-3 py-2 text-xs text-amber-300">
@@ -211,6 +261,7 @@ export function SetupScreen({
                 <thead className="sticky top-0 bg-slate-900">
                   <tr className="text-left text-xs uppercase text-slate-500">
                     <th className="px-3 py-2 font-medium">Nome</th>
+                    <th className="px-3 py-2 font-medium">Pos</th>
                     <th className="px-3 py-2 font-medium">Overall</th>
                     <th className="px-3 py-2 font-medium">Preço</th>
                     <th className="px-3 py-2"></th>
@@ -220,6 +271,7 @@ export function SetupScreen({
                   {filteredPlayers.map((p) => (
                     <tr key={p.id} className="text-slate-200">
                       <td className="px-3 py-2">{p.name}</td>
+                      <td className="px-3 py-2 text-slate-400">{p.position}</td>
                       <td className="px-3 py-2 text-slate-400">{p.overall}</td>
                       <td className="px-3 py-2 font-medium text-emerald-400">{formatPts(p.price)}</td>
                       <td className="px-3 py-2 text-right">
